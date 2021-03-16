@@ -7,7 +7,7 @@ DOCKER_TAG := master
 VERSION := $(shell git rev-parse --short HEAD)
 
 .PHONY: archive test-sqlite test-mysql test-postgres sql \
-	docker-image docker-images docker-run docker-sh
+	docker-image docker-images docker-publish-image docker-run docker-sh
 
 archive:
 	@ echo "Build archive: version=$(VERSION)"
@@ -48,8 +48,8 @@ docker-image:
 
 docker-publish-image:
 	@ docker login ${REG_URL} -u ${REG_USER} -p "${REG_PASS}"
-    @ docker push ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
-    @ docker logout
+	@ docker push ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
+	@ docker logout
 
 docker-images:
 	docker buildx build \
