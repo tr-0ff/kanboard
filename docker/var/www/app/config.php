@@ -11,5 +11,5 @@ define('DB_HOSTNAME', $_ENV['KANBOARD_DBHOST']);
 define('DB_NAME', 'kanboard');
 
 # Email configurations
-define('MAIL_FROM', $_ENV['KANBOARD_EMAIL_FROM']);
+// define('MAIL_FROM', $_ENV['KANBOARD_EMAIL_FROM']);
 
