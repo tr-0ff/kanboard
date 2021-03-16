@@ -1,4 +1,8 @@
-DOCKER_IMAGE := docker.io/kanboard/kanboard
+ifneq (,$(wildcard ./.env))
+    include .env
+    export
+endif
+
 DOCKER_TAG := master
 VERSION := $(shell git rev-parse --short HEAD)
 
@@ -40,18 +44,23 @@ sql:
 	@ grep -v "SET idle_in_transaction_session_timeout = 0;" app/Schema/Sql/postgres.sql > temp && mv temp app/Schema/Sql/postgres.sql
 
 docker-image:
-	@ docker build --build-arg VERSION=master.$(VERSION) -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	@ docker build --build-arg VERSION=master.$(VERSION) -t ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG) .
+
+docker-publish-image:
+	@ docker login ${REG_URL} -u ${REG_USER} -p "${REG_PASS}"
+    @ docker push ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
+    @ docker logout
 
 docker-images:
 	docker buildx build \
 		--platform linux/amd64,linux/arm64,linux/arm/v7,linux/arm/v6 \
 		--file Dockerfile \
 		--build-arg VERSION=master.$(VERSION) \
-		--tag $(DOCKER_IMAGE):$(VERSION) \
+		--tag ${DOCKER_IMAGE_NAME}:$(VERSION) \
 		.
 
 docker-run:
-	@ docker run --rm --name=kanboard -p 80:80 -p 443:443 $(DOCKER_IMAGE):$(DOCKER_TAG)
+	@ docker run --rm --name=kanboard -p 80:80 -p 443:443 ${DOCKER_IMAGE_NAME}:$(DOCKER_TAG)
 
 docker-sh:
 	@ docker exec -ti kanboard bash
